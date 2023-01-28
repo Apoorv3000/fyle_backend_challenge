@@ -75,6 +75,12 @@ class Assignment(db.Model):
                                 'This assignment belongs to some other student')
         assertions.assert_valid(assignment.content is not None,
                                 'assignment with empty content cannot be submitted')
+        assertions.assert_valid(
+            assignment.state == AssignmentStateEnum.DRAFT, 'only a draft assignment can be submitted')
+        assertions.assert_valid(assignment.content is not None,
+                                'assignment with empty content cannot be submitted')
+        assertions.assert_valid(
+            assignment.teacher_id is None, 'only a draft assignment can be submitted')
 
         assignment.teacher_id = teacher_id
         assignment.state = AssignmentStateEnum.SUBMITTED
@@ -102,9 +108,10 @@ class Assignment(db.Model):
             assignment.state == AssignmentStateEnum.SUBMITTED, "The assignment is not submitted")
         assertions.assert_valid(
             assignment.teacher_id == principal.teacher_id, "This assignment cannot be graded by you")
-
-        if grade not in GradeEnum.__members__:
-            raise ValueError("Invalid grade")
+        assertions.assert_valid(grade in [
+                                'A', 'B', 'C', 'D'], 'assignment with empty content cannot be submitted')
+        # if grade not in GradeEnum.__members__:
+        #     raise ValueError("Invalid grade")
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
         db.session.flush()

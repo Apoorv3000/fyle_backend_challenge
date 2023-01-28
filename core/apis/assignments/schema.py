@@ -48,3 +48,14 @@ class GradeAssignmentSchema(Schema):
     @post_load
     def initiate_class(self, data_dict, many, partial):
         return GeneralObject(**data_dict)
+
+
+# class GetAssignmentByIdSchema(Schema):
+#     class Meta:
+#         unknown = EXCLUDE
+
+#     id = fields.Integer(required=True, allow_none=False)
+
+#     @post_load
+#     def initiate_class(self, data_dict, many, partial):
+#         return GeneralObject(**data_dict)

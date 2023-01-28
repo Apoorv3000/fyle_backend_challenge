@@ -1,8 +1,9 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
 from core.models.assignments import Assignment
+from core.libs import assertions
 
 from .schema import AssignmentSchema, AssignmentSubmitSchema
 student_assignments_resources = Blueprint(
@@ -45,6 +46,12 @@ def submit_assignment(p, incoming_payload):
         teacher_id=submit_assignment_payload.teacher_id,
         principal=p
     )
-    db.session.commit()
-    submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
-    return APIResponse.respond(data=submitted_assignment_dump)
+    if submitted_assignment.state == 'DRAFT':
+        raise Exception("Only draft assignments can be submitted", 400)
+    else:
+        db.session.commit()
+        submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
+        return APIResponse.respond(data=submitted_assignment_dump)
+
+
+
